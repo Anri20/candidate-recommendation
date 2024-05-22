@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recommended Candidates</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <h1>Input</h1>
+    <div id="inputArea" style="display: flex; flex-direction: row;">
+        <table>
+            <tbody>
+                <tr>
+                    <td><label for="genderInput1">Gender</label></td>
+                    <td>:</td>
+                    <!-- <td><input type="text" id="genderInput"></td> -->
+                    <td><input type="text" id="genderInput1" value="wanita"></td>
+                </tr>
+                <tr>
+                    <td><label for="ageInput1">Age</label></td>
+                    <td>:</td>
+                    <!-- <td><input type="text" id="ageInput"></td> -->
+                    <td><input type="number" id="ageInput1" value="27"></td>
+                </tr>
+                <tr>
+                    <td><label for="statusInput1">Marital Status</label></td>
+                    <td>:</td>
+                    <!-- <td><input type="text" id="statusInput"></td> -->
+                    <td><input type="text" id="statusInput1" value="free"></td>
+                </tr>
+                <tr>
+                    <td><label for="educationInput1">Education Level</label></td>
+                    <td>:</td>
+                    <!-- <td><input type="text" id="educationInput"></td> -->
+                    <td><input type="text" id="educationInput1" value="d3"></td>
+                </tr>
+                <tr>
+                    <td><label for="experienceInput1">Experience</label></td>
+                    <td>:</td>
+                    <!-- <td><input type="text" id="experienceInput"></td> -->
+                    <td><input type="number" id="experienceInput1" value="3"></td>
+                </tr>
+                <tr>
+                    <td><label for="majorInput1">Study Major</label></td>
+                    <td>:</td>
+                    <!-- <td><input type="text" id="majorInput"></td> -->
+                    <td><input type="text" id="majorInput1" value="psikologi"></td>
+                </tr>
+                <tr>
+                    <td><label for="lastPosInput1">Last Position</label></td>
+                    <td>:</td>
+                    <!-- <td><input type="text" id="lastPosInput"></td> -->
+                    <td><input type="text" id="lastPosInput1" value="trainer"></td>
+                </tr>
+            </tbody>
+        </table>
+        <button id="addInput" style="height: 1%; align-self: flex-end;">+</button>
+    </div>
+    <br>
+    <button id="btnRecommend">Recommend Candidate</button>
+    <h1>Recommended Candidates</h1>
+    <table>
+        <tbody>
+            <tr>
+                <td><label for="showNum">Show</label></td>
+                <td>:</td>
+                <td><input type="number" id="showNum"></td>
+            </tr>
+        </tbody>
+    </table>
+    <br>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Similarity (%)</th>
+                <th>Name</th>
+                <th>Gender</th>
+                <th>Age</th>
+                <th>Marital Status</th>
+                <th>Education Level</th>
+                <th>Experience</th>
+                <th>Study Major</th>
+                <th>Last Position</th>
+            </tr>
+        </thead>
+        <tbody id="candidateRecommendationTable">
+
+        </tbody>
+        <!-- {% for candidate in recommended_candidates %}
+            {% if loop.index <= 10 %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ candidate[0] }}</td>
+                <td>{{ candidate[1] }}</td>
+                <td>{{ candidate[2] }}</td>
+                <td>{{ candidate[3] }}</td>
+                <td>{{ candidate[4] }}</td>
+                <td>{{ candidate[5] }}</td>
+                <td>{{ candidate[6] }}</td>
+                <td>{{ candidate[7] }}</td>
+                <td>{{ candidate[8] }}</td>
+            </tr>
+            {% endif %}
+        {% endfor %} -->
+
+    </table>
+</body>
+
+<script>
+    let tableCount = 1
+    document.getElementById('btnRecommend').addEventListener('click', function () {
+
+        let data = []
+        if (tableCount == 1) {
+            // Get input values
+            var gender = document.getElementById('genderInput'+tableCount.toString()).value;
+            var age = document.getElementById('ageInput'+tableCount.toString()).value;
+            var status = document.getElementById('statusInput'+tableCount.toString()).value;
+            var education = document.getElementById('educationInput'+tableCount.toString()).value;
+            var experience = document.getElementById('experienceInput'+tableCount.toString()).value;
+            var major = document.getElementById('majorInput'+tableCount.toString()).value;
+            var lastPos = document.getElementById('lastPosInput'+tableCount.toString()).value;
+
+            // Create data object
+            data = [
+                {
+                    "Gender": gender,
+                    "Age": age,
+                    "Marital_Status": status,
+                    "Education_Level": education,
+                    "Experience": experience,
+                    "Study_Major": major,
+                    "Last_Position": lastPos
+                    // Add other input values to the data object similarly
+                }
+            ];
+        } else {
+            let data_member = {}
+            for(let num=1; num<=tableCount; num++){
+                data_member = {
+                    "Gender": document.getElementById('genderInput'+num.toString()).value,
+                    "Age": document.getElementById('ageInput'+num.toString()).value,
+                    "Marital_Status": document.getElementById('statusInput'+num.toString()).value,
+                    "Education_Level": document.getElementById('educationInput'+num.toString()).value,
+                    "Experience": document.getElementById('experienceInput'+num.toString()).value,
+                    "Study_Major": document.getElementById('majorInput'+num.toString()).value,
+                    "Last_Position": document.getElementById('lastPosInput'+num.toString()).value
+                }
+                data.push(data_member)
+            }
+            console.log(data)
+        }
+
+        // Send data to Flask app using Fetch API
+        // fetch('/submit', {
+        fetch('/recommended_candidates', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data["data"])
+                console.log(data["data1"])
+                console.log(data)
+                showNum = document.getElementById("showNum").value
+                if (showNum == "") {
+                    showNum = 10
+                    document.getElementById("showNum").value = showNum
+                }
+
+                tableBody = document.getElementById("candidateRecommendationTable")
+                tableBody.innerHTML = ""
+                rowHTML = ""
+
+                for (let i = 0; i < data.length; i++) {
+                    if (i < showNum) {
+                        rowHTML += `
+                        <tr>
+                            <td>${i + 1}</td>
+                            <td>${data[i][0]}%</td>
+                            <td>${data[i][1]}</td>
+                            <td>${data[i][2]}</td>
+                            <td>${data[i][3]}</td>
+                            <td>${data[i][4]}</td>
+                            <td>${data[i][5]}</td>
+                            <td>${data[i][6]}</td>
+                            <td>${data[i][7]}</td>
+                            <td>${data[i][8]}</td>
+                        </tr>`
+                    }
+                }
+
+                tableBody.innerHTML = rowHTML
+                // Handle response from Flask app if needed
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    });
+
+    document.getElementById('addInput').addEventListener('click', function () {
+        // Create the second table dynamically
+        var table = document.createElement('table');
+        table.innerHTML = `
+            <tbody>
+                <tr>
+                    <td><label for="genderInput${tableCount + 1}">Gender</label></td>
+                    <td>:</td>
+                    <!-- <td><input type="text" id="genderInput"></td> -->
+                    <td><input type="text" id="genderInput${tableCount + 1}" value="wanita"></td>
+                </tr>
+                <tr>
+                    <td><label for="ageInput${tableCount + 1}">Age</label></td>
+                    <td>:</td>
+                    <!-- <td><input type="text" id="ageInput"></td> -->
+                    <td><input type="number" id="ageInput${tableCount + 1}" value="27"></td>
+                </tr>
+                <tr>
+                    <td><label for="statusInput${tableCount + 1}">Marital Status</label></td>
+                    <td>:</td>
+                    <!-- <td><input type="text" id="statusInput"></td> -->
+                    <td><input type="text" id="statusInput${tableCount + 1}" value="free"></td>
+                </tr>
+                <tr>
+                    <td><label for="educationInput${tableCount + 1}">Education Level</label></td>
+                    <td>:</td>
+                    <!-- <td><input type="text" id="educationInput"></td> -->
+                    <td><input type="text" id="educationInput${tableCount + 1}" value="d3"></td>
+                </tr>
+                <tr>
+                    <td><label for="experienceInput${tableCount + 1}">Experience</label></td>
+                    <td>:</td>
+                    <!-- <td><input type="text" id="experienceInput"></td> -->
+                    <td><input type="number" id="experienceInput${tableCount + 1}" value="3"></td>
+                </tr>
+                <tr>
+                    <td><label for="majorInput${tableCount + 1}">Study Major</label></td>
+                    <td>:</td>
+                    <!-- <td><input type="text" id="majorInput"></td> -->
+                    <td><input type="text" id="majorInput${tableCount + 1}" value="psikologi"></td>
+                </tr>
+                <tr>
+                    <td><label for="lastPosInput${tableCount + 1}">Last Position</label></td>
+                    <td>:</td>
+                    <!-- <td><input type="text" id="lastPosInput"></td> -->
+                    <td><input type="text" id="lastPosInput${tableCount + 1}" value="trainer"></td>
+                </tr>
+            </tbody>
+        `;
+
+        let button = document.getElementById("addInput")
+
+        // Select the div element
+        var div = document.getElementById('inputArea');
+
+        // Append the second table to the inputArea div
+        div.insertBefore(table, button);
+
+        // Select all table elements inside the div
+        var tables = div.getElementsByTagName('table');
+
+        // Get the count of tables
+        tableCount = tables.length;
+
+        // console.log("Number of tables inside the div:", tableCount);
+    })
+</script>
+
+</html>
